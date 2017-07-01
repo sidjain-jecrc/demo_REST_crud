@@ -7,4 +7,6 @@
     <string name="menu_post_sort_asc">Sort Ascending</string>
     <string name="menu_post_sort_desc">Sort Descending</string>
     <string name="menu_post_add">Add Post</string>
+    <string name="add_post_hint_title">Title</string>
+    <string name="add_post_hint_body">Body</string>
 </resources>

@@ -6,22 +6,35 @@ package com.sid.kubra.jsondemoapp.model;
 
 public class UserPost {
 
-    private Long postId;
+    private long id;
     private String title;
     private String body;
+    private long userId;
 
-    public UserPost(Long postId, String title, String body) {
-        this.postId = postId;
+    public UserPost() {
+
+    }
+
+    public UserPost(Long id, String title, String body) {
+        this.id = id;
         this.title = title;
         this.body = body;
     }
 
-    public Long getPostId() {
-        return postId;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setPostId(Long postId) {
-        this.postId = postId;
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {

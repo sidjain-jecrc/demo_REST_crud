@@ -2,6 +2,7 @@ package com.sid.kubra.jsondemoapp.restclient;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sid.kubra.jsondemoapp.model.User;
 import com.sid.kubra.jsondemoapp.model.UserAddress;
 import com.sid.kubra.jsondemoapp.model.UserPost;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -28,6 +30,7 @@ import okhttp3.Response;
 public class JsonPlaceRestClient {
 
     protected static final String TAG = JsonPlaceRestClient.class.getSimpleName();
+    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     protected static final String baseUrl = "http://jsonplaceholder.typicode.com";
     private JSONParser parser;
     private static OkHttpClient httpClient = new OkHttpClient();
@@ -63,6 +66,36 @@ public class JsonPlaceRestClient {
             Log.e(TAG, "Error - request user posts: " + e.getMessage());
         }
         return null;
+    }
+
+    public UserPost addPost(UserPost userPost) {
+
+        try {
+            HttpUrl.Builder urlBuilder = HttpUrl.parse(baseUrl + "/posts").newBuilder();
+            String requestUrl = urlBuilder.build().toString();
+            String postJsonString = buildPostJsonString(userPost);
+            String responseJsonString = performPostRequest(requestUrl, postJsonString);
+            return parsePostJsonToObject(responseJsonString);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error - add post: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private UserPost parsePostJsonToObject(String jsonString) {
+        UserPost newPost = null;
+        try {
+            JSONObject postObject = (JSONObject) parser.parse(jsonString);
+            long postId = (long) postObject.get("id");
+            String title = (String) postObject.get("title");
+            String body = (String) postObject.get("body");
+            newPost = new UserPost(postId, title, body);
+
+        } catch (ParseException e) {
+            Log.e(TAG, "Add Post:Parser exception: " + e.getMessage());
+        }
+        return newPost;
     }
 
     private List<UserPost> parsePostList(String jsonString) {
@@ -119,8 +152,27 @@ public class JsonPlaceRestClient {
     private String performGetRequest(String url) throws IOException {
         Request request = new Request.Builder().url(url).build();
         Response response = httpClient.newCall(request).execute();
-        String jsonString = response.body().string();
-        return jsonString;
+        return response.body().string();
+    }
+
+    private String performPostRequest(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(JSON, json);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Response response = httpClient.newCall(request).execute();
+        if (response.isSuccessful()) {
+            Log.d(TAG, "add post request successfull");
+            return response.body().string();
+        }
+        return null;
+    }
+
+    private String buildPostJsonString(UserPost post) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String userPostString = mapper.writeValueAsString(post);
+        return userPostString;
     }
 
 }

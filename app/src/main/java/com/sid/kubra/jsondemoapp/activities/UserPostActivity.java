@@ -23,8 +23,9 @@ import java.util.List;
 public class UserPostActivity extends AppCompatActivity {
 
     protected static final String TAG = UserPostActivity.class.getSimpleName();
-    ListView list_user_post;
-    ArrayAdapter<UserPost> userPostAdapter;
+    protected ListView list_user_post;
+    protected ArrayAdapter<UserPost> userPostAdapter;
+    protected String userId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class UserPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_post);
 
         Intent intent = getIntent();
-        String userId = intent.getStringExtra("EXTRA_USER_ID");
+        userId = intent.getStringExtra("EXTRA_USER_ID");
 
         list_user_post = (ListView) findViewById(R.id.list_user_post);
         if (list_user_post != null) {
@@ -98,6 +99,12 @@ public class UserPostActivity extends AppCompatActivity {
                 });
                 list_user_post.setAdapter(userPostAdapter);
                 userPostAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_add_post:
+                Intent jumpToAddPost = new Intent(UserPostActivity.this, AddPostActivity.class);
+                jumpToAddPost.putExtra("EXTRA_USER_ID", userId);
+                startActivity(jumpToAddPost);
                 return true;
 
             default:
