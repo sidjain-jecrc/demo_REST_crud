@@ -22,12 +22,12 @@ import java.util.List;
  * Created by Siddharth on 6/24/2017.
  */
 
-public class UserPostListAdapter extends ArrayAdapter<UserPost> {
+public class PostListAdapter extends ArrayAdapter<UserPost> {
 
     private final Context context;
     private final List<UserPost> posts;
 
-    public UserPostListAdapter(@NonNull Context context, @NonNull List<UserPost> posts) {
+    public PostListAdapter(@NonNull Context context, @NonNull List<UserPost> posts) {
         super(context, R.layout.list_post, posts);
         this.context = context;
         this.posts = posts;

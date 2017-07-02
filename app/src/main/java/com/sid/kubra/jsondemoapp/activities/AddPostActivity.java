@@ -1,5 +1,6 @@
 package com.sid.kubra.jsondemoapp.activities;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,6 +49,15 @@ public class AddPostActivity extends AppCompatActivity {
 
     private class AddUserPostTask extends AsyncTask<String, Void, UserPost> {
 
+        ProgressDialog pd = new ProgressDialog(AddPostActivity.this, ProgressDialog.STYLE_SPINNER);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("adding post..");
+            pd.show();
+        }
+
         @Override
         protected UserPost doInBackground(String... input) {
 
@@ -66,6 +76,11 @@ public class AddPostActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(UserPost post) {
+
+            if (pd.isShowing()) {
+                pd.dismiss();
+            }
+
             if (post != null) {
                 long postId = post.getId();
                 Toast.makeText(AddPostActivity.this, "Post successfully added with id:" + postId, Toast.LENGTH_SHORT).show();

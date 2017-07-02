@@ -70,7 +70,9 @@
         app:layout_constraintTop_toTopOf="@+id/add_post_lbl_heading"
         app:layout_constraintLeft_toRightOf="@+id/add_post_lbl_title"
         android:layout_marginLeft="14dp"
-        android:layout_marginRight="14dp" />
+        android:layout_marginRight="14dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/add_post_txt_body"
