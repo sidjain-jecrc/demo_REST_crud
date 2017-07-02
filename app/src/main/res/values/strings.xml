@@ -9,4 +9,8 @@
     <string name="menu_post_add">Add Post</string>
     <string name="add_post_hint_title">Title</string>
     <string name="add_post_hint_body">Body</string>
+
+    <string name="post_menu_option_edit">Edit Post</string>
+    <string name="post_menu_option_delete">Delete Post</string>
+
 </resources>

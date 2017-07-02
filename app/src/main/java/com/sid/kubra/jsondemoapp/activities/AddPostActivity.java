@@ -1,6 +1,7 @@
 package com.sid.kubra.jsondemoapp.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -81,12 +82,17 @@ public class AddPostActivity extends AppCompatActivity {
                 pd.dismiss();
             }
 
+            Intent returnIntent = new Intent();
             if (post != null) {
+
                 long postId = post.getId();
-                Toast.makeText(AddPostActivity.this, "Post successfully added with id:" + postId, Toast.LENGTH_SHORT).show();
+                returnIntent.putExtra("POST_ID", postId);
+                setResult(AppCompatActivity.RESULT_OK, returnIntent);
+                AddPostActivity.this.finish();
+
             } else {
-                Log.d(TAG, "add post request failed!!");
-                Toast.makeText(AddPostActivity.this, "add post request failed!!", Toast.LENGTH_SHORT).show();
+                setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
+                AddPostActivity.this.finish();
             }
         }
     }
