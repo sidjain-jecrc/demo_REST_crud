@@ -3,7 +3,6 @@ package com.sid.kubra.jsondemoapp.restclient;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sid.kubra.jsondemoapp.R;
 import com.sid.kubra.jsondemoapp.model.User;
 import com.sid.kubra.jsondemoapp.model.UserAddress;
 import com.sid.kubra.jsondemoapp.model.UserPost;
@@ -33,13 +32,12 @@ public class JsonPlaceRestClient {
     protected static final String TAG = JsonPlaceRestClient.class.getSimpleName();
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     protected static final String baseUrl = "http://jsonplaceholder.typicode.com";
+    private static OkHttpClient httpClient = null;
     private JSONParser parser;
-    private static OkHttpClient httpClient = new OkHttpClient();
-    final static String PUT_REQUEST = "PUT";
-    final static String PATCH_REQUEST = "PATCH";
 
     public JsonPlaceRestClient() {
         parser = new JSONParser();
+        httpClient = new OkHttpClient();
     }
 
     public List<User> requestUsersList() {
@@ -85,12 +83,12 @@ public class JsonPlaceRestClient {
         return null;
     }
 
-    public UserPost updatePost(long postId, UserPost post, String httpVerb) {
+    public UserPost updatePost(UserPost post) {
         try {
-            HttpUrl.Builder urlBuilder = HttpUrl.parse(baseUrl + "/posts/" + postId).newBuilder();
+            HttpUrl.Builder urlBuilder = HttpUrl.parse(baseUrl + "/posts/" + post.getId()).newBuilder();
             String requestUrl = urlBuilder.build().toString();
             String postJsonString = buildPostJsonString(post);
-            String responseJsonString = performPutOrPatchRequest(requestUrl, postJsonString, httpVerb);
+            String responseJsonString = performPutRequest(requestUrl, postJsonString);
             return parseJsonToPostObject(responseJsonString);
 
         } catch (Exception e) {
@@ -213,31 +211,16 @@ public class JsonPlaceRestClient {
         return true;
     }
 
-    private String performPutOrPatchRequest(String url, String json, String httpVerb) throws IOException {
+    private String performPutRequest(String url, String json) throws IOException {
 
         RequestBody body = RequestBody.create(JSON, json);
-        Request putOrPatchRequest = null;
-
-        switch (httpVerb) {
-
-            case PUT_REQUEST:
-                putOrPatchRequest = new Request.Builder()
-                        .url(url)
-                        .put(body)
-                        .build();
-                break;
-
-            case PATCH_REQUEST:
-                putOrPatchRequest = new Request.Builder()
-                        .url(url)
-                        .patch(body)
-                        .build();
-
-                break;
-        }
-        Response response = httpClient.newCall(putOrPatchRequest).execute();
+        Request putRequest = new Request.Builder()
+                .url(url)
+                .put(body)
+                .build();
+        Response response = httpClient.newCall(putRequest).execute();
         if (!response.isSuccessful()) {
-            Log.d(TAG, "put/patch post request failed");
+            Log.d(TAG, "edit(put) post request failed");
             return null;
         }
         return response.body().string();

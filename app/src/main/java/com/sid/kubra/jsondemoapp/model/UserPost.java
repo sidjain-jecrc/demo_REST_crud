@@ -79,4 +79,21 @@ public class UserPost implements Parcelable {
         parcel.writeString(body);
         parcel.writeLong(userId);
     }
+
+    public static final Parcelable.Creator<UserPost> CREATOR = new Parcelable.Creator<UserPost>() {
+        public UserPost createFromParcel(Parcel in) {
+            return new UserPost(in);
+        }
+
+        public UserPost[] newArray(int size) {
+            return new UserPost[size];
+        }
+    };
+
+    private UserPost(Parcel in) {
+        id = in.readLong();
+        title = in.readString();
+        body = in.readString();
+        userId = in.readLong();
+    }
 }
