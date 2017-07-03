@@ -28,7 +28,7 @@ public class PostListActivity extends AppCompatActivity {
 
     protected static final String TAG = PostListActivity.class.getSimpleName();
     protected ListView list_user_post;
-    protected ArrayAdapter<UserPost> userPostAdapter;
+    protected ArrayAdapter<UserPost> postListAdapter;
     protected String userId = null;
     static final int ADD_POST_RESULT = 1;
     static final int EDIT_POST_RESULT = 2;
@@ -62,7 +62,7 @@ public class PostListActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        UserPost post = userPostAdapter.getItem(info.position);
+        UserPost post = postListAdapter.getItem(info.position);
 
         switch (item.getItemId()) {
             case R.id.action_edit_post:
@@ -71,16 +71,16 @@ public class PostListActivity extends AppCompatActivity {
                 startActivityForResult(editPostIntent, EDIT_POST_RESULT);
                 return true;
             case R.id.action_delete_post:
-                new DeletePostTask().execute(post.getId());
+                new DeletePostTask().execute(String.valueOf(post.getId()), String.valueOf(info.position));
                 return true;
             default:
                 return true;
         }
     }
 
-    private class DeletePostTask extends AsyncTask<Long, Void, Boolean> {
-
+    private class DeletePostTask extends AsyncTask<String, Void, Boolean> {
         ProgressDialog pd = new ProgressDialog(PostListActivity.this, ProgressDialog.STYLE_SPINNER);
+        int postPosition = -1;
 
         @Override
         protected void onPreExecute() {
@@ -90,8 +90,9 @@ public class PostListActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Long... input) {
-            long postId = input[0];
+        protected Boolean doInBackground(String... input) {
+            long postId = Long.valueOf(input[0]);
+            postPosition = Integer.valueOf(input[1]);
             JsonPlaceRestClient client = new JsonPlaceRestClient();
             return client.deletePost(postId);
         }
@@ -101,6 +102,9 @@ public class PostListActivity extends AppCompatActivity {
                 pd.dismiss();
             }
             if (isPostDeleted) {
+                UserPost postToRemove = postListAdapter.getItem(postPosition);
+                postListAdapter.remove(postToRemove);
+                postListAdapter.notifyDataSetChanged();
                 Toast.makeText(PostListActivity.this, "post deletion successful", Toast.LENGTH_SHORT).show();
             } else {
                 Log.d(TAG, "post could not be deleted");
@@ -133,8 +137,8 @@ public class PostListActivity extends AppCompatActivity {
                 pd.dismiss();
             }
             if (posts != null && posts.size() > 0) {
-                userPostAdapter = new PostListAdapter(PostListActivity.this, posts);
-                list_user_post.setAdapter(userPostAdapter);
+                postListAdapter = new PostListAdapter(PostListActivity.this, posts);
+                list_user_post.setAdapter(postListAdapter);
             } else {
                 Log.d(TAG, "no posts found for selected user");
                 Toast.makeText(PostListActivity.this, "no posts found for selected user", Toast.LENGTH_SHORT).show();
@@ -154,25 +158,25 @@ public class PostListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case R.id.action_sort_asc:
-                userPostAdapter.sort(new Comparator<UserPost>() {
+                postListAdapter.sort(new Comparator<UserPost>() {
                     @Override
                     public int compare(UserPost post1, UserPost post2) {
                         return post1.getTitle().compareTo(post2.getTitle());
                     }
                 });
-                list_user_post.setAdapter(userPostAdapter);
-                userPostAdapter.notifyDataSetChanged();
+                list_user_post.setAdapter(postListAdapter);
+                postListAdapter.notifyDataSetChanged();
                 return true;
 
             case R.id.action_sort_desc:
-                userPostAdapter.sort(new Comparator<UserPost>() {
+                postListAdapter.sort(new Comparator<UserPost>() {
                     @Override
                     public int compare(UserPost post1, UserPost post2) {
                         return post2.getTitle().compareTo(post1.getTitle());
                     }
                 });
-                list_user_post.setAdapter(userPostAdapter);
-                userPostAdapter.notifyDataSetChanged();
+                list_user_post.setAdapter(postListAdapter);
+                postListAdapter.notifyDataSetChanged();
                 return true;
 
             case R.id.action_add_post:
@@ -191,8 +195,10 @@ public class PostListActivity extends AppCompatActivity {
 
         if (requestCode == ADD_POST_RESULT) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
-                long postId = data.getLongExtra("POST_ID", 0);
-                Toast.makeText(PostListActivity.this, "post added with id:" + postId, Toast.LENGTH_SHORT).show();
+                UserPost newPost = (UserPost) data.getParcelableExtra("POST_OBJECT");
+                postListAdapter.add(newPost);
+                postListAdapter.notifyDataSetChanged();
+                Toast.makeText(PostListActivity.this, "post added with id:" + newPost.getId(), Toast.LENGTH_SHORT).show();
             }
             if (resultCode == AppCompatActivity.RESULT_CANCELED) {
                 Toast.makeText(PostListActivity.this, "add post request failed!!", Toast.LENGTH_SHORT).show();
@@ -201,8 +207,10 @@ public class PostListActivity extends AppCompatActivity {
 
         } else if (requestCode == EDIT_POST_RESULT) {
             if (resultCode == AppCompatActivity.RESULT_OK) {
-                long postId = data.getLongExtra("POST_ID", 0);
-                Toast.makeText(PostListActivity.this, "post edited with id:" + postId, Toast.LENGTH_SHORT).show();
+                UserPost modifiedPost = (UserPost) data.getParcelableExtra("POST_OBJECT");
+                postListAdapter.add(modifiedPost);
+                postListAdapter.notifyDataSetChanged();
+                Toast.makeText(PostListActivity.this, "post edited with id:" + modifiedPost.getId(), Toast.LENGTH_SHORT).show();
             }
             if (resultCode == AppCompatActivity.RESULT_CANCELED) {
                 Toast.makeText(PostListActivity.this, "edit post request failed!!", Toast.LENGTH_SHORT).show();

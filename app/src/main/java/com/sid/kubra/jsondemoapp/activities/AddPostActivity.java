@@ -76,20 +76,17 @@ public class AddPostActivity extends AppCompatActivity {
             return newPost;
         }
 
-        protected void onPostExecute(UserPost post) {
+        protected void onPostExecute(UserPost newPost) {
 
             if (pd.isShowing()) {
                 pd.dismiss();
             }
 
             Intent returnIntent = new Intent();
-            if (post != null) {
-
-                long postId = post.getId();
-                returnIntent.putExtra("POST_ID", postId);
+            if (newPost != null) {
+                returnIntent.putExtra("POST_OBJECT", newPost);
                 setResult(AppCompatActivity.RESULT_OK, returnIntent);
                 AddPostActivity.this.finish();
-
             } else {
                 setResult(AppCompatActivity.RESULT_CANCELED, returnIntent);
                 AddPostActivity.this.finish();

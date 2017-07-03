@@ -45,7 +45,6 @@ public class JsonPlaceRestClient {
         try {
             String requestUrl = baseUrl + "/users";
             String jsonString = performGetRequest(requestUrl);
-            Log.d(TAG, "Json response: " + jsonString);
             return parseUserList(jsonString);
 
         } catch (Exception e) {

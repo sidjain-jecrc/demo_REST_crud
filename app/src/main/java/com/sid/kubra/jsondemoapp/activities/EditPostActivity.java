@@ -53,6 +53,7 @@ public class EditPostActivity extends AppCompatActivity {
                     modifiedPost.setBody(modifiedBody);
                     modifiedPost.setId(userPost.getId());
                     modifiedPost.setUserId(userPost.getUserId());
+
                     new EditPostTask().execute(modifiedPost);
                 } else {
                     Toast.makeText(EditPostActivity.this, "nothing modified", Toast.LENGTH_SHORT).show();
@@ -88,9 +89,7 @@ public class EditPostActivity extends AppCompatActivity {
 
             Intent returnIntent = new Intent();
             if (post != null) {
-
-                long postId = post.getId();
-                returnIntent.putExtra("POST_ID", postId);
+                returnIntent.putExtra("POST_OBJECT", post);
                 setResult(AppCompatActivity.RESULT_OK, returnIntent);
                 EditPostActivity.this.finish();
 
